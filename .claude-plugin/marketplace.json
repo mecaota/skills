@@ -34,6 +34,21 @@
         "antigravity",
         "proofreading"
       ]
+    },
+    {
+      "name": "conductor",
+      "source": "./plugins/conductor",
+      "description": "メインセッションを自分では作業しない指揮塔にして、サブセッションとサブエージェントに下請けに出すスキルです。どこまで任せるかをオプションで指定できます。",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": [
+        "conductor",
+        "delegate",
+        "orchestrator",
+        "subagent",
+        "subsession",
+        "workflow"
+      ]
     }
   ]
 }
