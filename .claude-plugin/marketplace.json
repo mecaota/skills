@@ -14,7 +14,26 @@
       "description": "作業後にモデル・effort とサブエージェントの使い方が適切だったかを振り返り、教訓をログに記録するスキルです。",
       "version": "0.1.0",
       "category": "productivity",
-      "keywords": ["retrospective", "subagent", "model-selection", "workflow"]
+      "keywords": [
+        "retrospective",
+        "subagent",
+        "model-selection",
+        "workflow"
+      ]
+    },
+    {
+      "name": "japanese-review",
+      "source": "./plugins/japanese-review",
+      "description": "日本語で書いた文書を、Antigravity(gemini MCP)、gemini-api、セルフレビューの順で校正するスキルです。",
+      "version": "0.1.0",
+      "category": "productivity",
+      "keywords": [
+        "japanese",
+        "review",
+        "gemini",
+        "antigravity",
+        "proofreading"
+      ]
     }
   ]
 }
