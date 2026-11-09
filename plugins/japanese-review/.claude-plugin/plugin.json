@@ -1,0 +1,12 @@
+{
+  "name": "japanese-review",
+  "description": "日本語で書いた文書を、Antigravity(gemini MCP)、gemini-api、セルフレビューの順で校正するスキルです。",
+  "version": "0.1.0",
+  "author": {
+    "name": "mecaota"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/mecaota/skills",
+  "repository": "https://github.com/mecaota/skills",
+  "keywords": ["japanese", "review", "gemini", "antigravity", "proofreading"]
+}
