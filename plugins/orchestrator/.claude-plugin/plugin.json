@@ -1,5 +1,5 @@
 {
-  "name": "conductor",
+  "name": "orchestrator",
   "description": "メインセッションを自分では作業しない指揮塔にして、サブセッションとサブエージェントに下請けに出すスキルです。どこまで任せるかをオプションで指定できます。",
   "version": "0.1.0",
   "author": {
@@ -8,5 +8,5 @@
   "license": "MIT",
   "homepage": "https://github.com/mecaota/skills",
   "repository": "https://github.com/mecaota/skills",
-  "keywords": ["conductor", "delegate", "orchestrator", "subagent", "subsession", "workflow"]
+  "keywords": ["delegate", "orchestrator", "subagent", "subsession", "workflow"]
 }
