@@ -7,7 +7,7 @@
 |---|---|
 | retrospective | 作業後に、モデル・effort とサブエージェントの使い方が適切だったかを振り返り、教訓をログに記録する |
 | japanese-review | 日本語で書いた文書を、Antigravity(gemini MCP)→ gemini-api → セルフレビューの順で校正する |
-| conductor | メインセッションを自分では作業しない指揮塔(管理職)にして、サブセッションとサブエージェントに下請けに出す。どこまで任せるかをオプションで指定できる |
+| orchestrator | メインセッションを自分では作業しない指揮塔(管理職)にして、サブセッションとサブエージェントに下請けに出す。どこまで任せるかをオプションで指定できる |
 
 ## インストール
 
@@ -17,7 +17,7 @@ Claude Code で次を実行します。
 /plugin marketplace add mecaota/skills
 /plugin install retrospective@mecaota-skills
 /plugin install japanese-review@mecaota-skills
-/plugin install conductor@mecaota-skills
+/plugin install orchestrator@mecaota-skills
 ```
 
 ## retrospective の使い方
@@ -45,7 +45,7 @@ PRの Description、リリースノート、メモなど、日本語の文書を
 - 事前に、`gemini` MCP(Antigravity CLI `agy` を呼ぶもの)と `gemini-api` CLI の、少なくとも一方を使える状態にしておいてください。プラグインの依存では外部のMCPやCLIを宣言できないため、このプラグインは同梱も自動インストールもしません。起動時に使える手段を確認し、使えないものは飛ばします。
 - 文法・表現の指摘は反映し、数値や挙動など事実を変える指摘は元の事実と照らして判断します。
 
-## conductor の使い方
+## orchestrator の使い方
 
 起動したあとのセッションは、自分では作業せず、指揮塔として仕事を下請けに出します。次のように話しかけると起動します。
 
