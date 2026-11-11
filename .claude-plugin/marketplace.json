@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Claude Code 向けに、使い勝手の良くなったスキルを集めたマーケットプレイスです。",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "retrospective",
       "source": "./plugins/retrospective",
       "description": "作業後にモデル・effort とサブエージェントの使い方が適切だったかを振り返り、教訓をログに記録するスキルです。",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "productivity",
       "keywords": [
         "retrospective",
