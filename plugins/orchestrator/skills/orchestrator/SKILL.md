@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: メインセッションを、自分では作業しない指揮塔(管理職)として振る舞わせ、仕事をサブセッションとサブエージェントに下請けに出すスキル。タスクの分割、サブセッションの起動、文脈を持つ既存セッションへの伝達、サブエージェントへの委譲、完了報告の確認、ユーザーへの取り次ぎ、後片付けまでを担う。オプション scope で、どこまで下請けに出すか(all / heavy / changes)を、via で、委譲の手段(auto / sessions / agents)を、session_per_task で、タスクごとにサブセッションを立ち上げるか(true / false)を指定できる。役ごとのモデル(manager / advisor / designer / explorer / coder / worker)も指定できる。既定は scope=all, via=auto, session_per_task=true で、メインはいっさい作業しない。「指揮塔になって」「管理職として動いて」「各タスクをサブセッションに分けて」「全部サブエージェントに任せて」「今後の作業は全部委譲して」「丸投げモードにして」「重い作業だけ委譲して」「orchestrator」などの依頼で使う。
+description: メインセッションを、自分では作業しない指揮塔(管理職)として振る舞わせ、仕事をサブセッションとサブエージェントに下請けに出すスキル。タスクの分割、サブセッションの起動、文脈を持つ既存セッションへの伝達、サブエージェントへの委譲、完了報告の確認、ユーザーへの取り次ぎ、後片付けまでを担う。オプション scope で、どこまで下請けに出すか(all / heavy / changes)を、via で、委譲の手段(auto / sessions / agents)を、session_per_task で、タスクごとにサブセッションを立ち上げるか(true / false)を指定できる。役ごとのモデル(manager / advisor / designer / explorer / coder / assister)も指定できる。既定は scope=all, via=auto, session_per_task=true で、メインはいっさい作業しない。「指揮塔になって」「管理職として動いて」「各タスクをサブセッションに分けて」「全部サブエージェントに任せて」「今後の作業は全部委譲して」「丸投げモードにして」「重い作業だけ委譲して」「orchestrator」などの依頼で使う。
 version: 2
 ---
 
@@ -65,7 +65,7 @@ version: 2
 | プロダクトオーナー(視覚レビュー、デザイン・モデリングの構築) | `designer` | なし(独自) | `fable` |
 | チームリーダー(調べ物と集約) | `explorer` | なし(組み込みの `Explore` に合わせた名前) | `sonnet` |
 | コーダー(実装、Unity の操作、コードの確認) | `coder` | なし(独自) | `auto` |
-| 事務係(反復作業) | `worker` | なし(small/fast モデルの枠に相当。`ANTHROPIC_DEFAULT_HAIKU_MODEL`、旧 `ANTHROPIC_SMALL_FAST_MODEL`) | `haiku` |
+| 事務係(反復作業) | `assister` | なし(small/fast モデルの枠に相当。`ANTHROPIC_DEFAULT_HAIKU_MODEL`、旧 `ANTHROPIC_SMALL_FAST_MODEL`) | `haiku` |
 
 総監督(ユーザー)はオプションにしない。
 
@@ -74,7 +74,7 @@ version: 2
 - 引数は `key=value` のほか、CLI 風の `--advisor fable` や `--advisor=fable`、自然言語(「視覚レビューは Opus で」「調べ物は Haiku に」)でもよい
 - `manager`: スキルからはメインセッションのモデルを切り替えられない。起動時のメインのモデルが `manager` の値と違えば、開始時の宣言でその旨を伝え、`/model` での切り替えを案内するだけにする。自分で切り替えようとしない
 - `advisor`: 名前は Claude Code 標準の advisor に合わせたが、決めるのは、このスキルが起動するプランナー担当のモデルだけ。Claude Code の `advisorModel` 設定や advisor ツールは変更しない
-- `worker`: 決めるのは、このスキルが起動する事務係のモデルだけ。環境変数は変更しない
+- `assister`: 決めるのは、このスキルが起動する事務係のモデルだけ。環境変数は変更しない
 
 ## 前提の確認
 
@@ -131,7 +131,7 @@ version: 2
 | チームリーダー | Sonnet | `explorer` | 調べ物と、その結果の集約(Reduce)・取りまとめ |
 | プランナー | Fable | `advisor` | 難しい設計・判断 |
 | コーダー | Sonnet / Opus(難度で分ける) | `coder`(既定 `auto`) | 実装、Unity の操作、コードの確認 |
-| 事務係 | Haiku | `worker` | 簡単で明確な、反復の要る単純作業 |
+| 事務係 | Haiku | `assister` | 簡単で明確な、反復の要る単純作業 |
 
 モデルの指定値は次のとおり。
 
@@ -152,7 +152,7 @@ version: 2
   - そのほか、複雑な仕様の組み立てや、Unity・Figma のような視覚的な判断との組み合わせが要る作業
 - **コーダー(`coder`、既定 `auto`)**: `auto` のときは、方針が明確で小さな実装は Sonnet、Unity の操作・込み入った実装・コードの確認は Opus にする。モデルを指定したときは、すべての実装をそのモデルに任せる
 - **チームリーダー(`explorer`、既定 Sonnet)**: 調べ物と、複数の調べ物の結果の集約を受け持つ
-- **事務係(`worker`、既定 Haiku)**: 手順が決まっていて判断の要らない、繰り返しの作業(一括の置き換え、決まった形式での取得、確定した返信文の投稿など)
+- **事務係(`assister`、既定 Haiku)**: 手順が決まっていて判断の要らない、繰り返しの作業(一括の置き換え、決まった形式での取得、確定した返信文の投稿など)
 
 ### 迷ったとき
 
@@ -160,14 +160,14 @@ version: 2
 - 立体の形、シーンの構成、仕組み全体の設計が絡めば `advisor`(既定 Fable)
 - 方針が決まっていて手を動かすだけなら `coder`。`auto` なら、小さく明確なものは Sonnet、込み入ったものは Opus
 - 調べて結論をまとめるだけなら `explorer`(既定 Sonnet)
-- 判断が要らない繰り返しなら `worker`(既定 Haiku)
+- 判断が要らない繰り返しなら `assister`(既定 Haiku)
 - どちらか決めきれないときは、重いほうのモデルを選ぶ
 
 ## 手段の使い分け(via=auto のとき)
 
 | 作業の性質 | 置き場所 |
 |---|---|
-| 調べ物、読み取り、集計、検証など、結論だけが欲しい | `Agent`。モデルは配役表に従う(調べ物は `explorer`、判断の要らない反復は `worker`、視覚レビューやデザインのレビューは `designer`、難しい設計は `advisor` の値)。調べ物は `Explore` や `researcher`、方針の設計は `Plan` |
+| 調べ物、読み取り、集計、検証など、結論だけが欲しい | `Agent`。モデルは配役表に従う(調べ物は `explorer`、判断の要らない反復は `assister`、視覚レビューやデザインのレビューは `designer`、難しい設計は `advisor` の値)。調べ物は `Explore` や `researcher`、方針の設計は `Plan` |
 | ブランチ・PR・ファイルの変更が残る実装、途中で開いて確認・指示したくなる長い作業 | 独立したサブセッション(`start_session`) |
 | 既存のサブセッションの文脈の続き | そのセッションへ伝達(`send_message` / `SendMessage`) |
 
