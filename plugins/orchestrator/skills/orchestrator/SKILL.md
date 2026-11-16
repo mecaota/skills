@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: メインセッションを、自分では作業しない指揮塔(管理職)として振る舞わせ、仕事をサブセッションとサブエージェントに下請けに出すスキル。タスクの分割、サブセッションの起動、文脈を持つ既存セッションへの伝達、サブエージェントへの委譲、完了報告の確認、ユーザーへの取り次ぎ、後片付けまでを担う。オプション scope で、どこまで下請けに出すか(all / heavy / changes)を、via で、委譲の手段(auto / sessions / agents)を、session_per_task で、タスクごとにサブセッションを立ち上げるか(true / false)を指定できる。役ごとのモデル(advisor / designer / leader / explorer / coder / assister)も指定できる。既定は scope=all, via=auto, session_per_task=true で、メインはいっさい作業しない。「指揮塔になって」「管理職として動いて」「各タスクをサブセッションに分けて」「全部サブエージェントに任せて」「今後の作業は全部委譲して」「丸投げモードにして」「重い作業だけ委譲して」「orchestrator」などの依頼で使う。
+description: メインセッションを、自分では作業しない指揮塔(管理職)として振る舞わせ、仕事をサブセッションとサブエージェントに下請けに出すスキル。タスクの分割、サブセッションの起動、文脈を持つ既存セッションへの伝達、サブエージェントへの委譲、完了報告の確認、ユーザーへの取り次ぎ、後片付けまでを担う。オプション scope で、どこまで下請けに出すか(all / heavy / changes)を、via で、委譲の手段(auto / sessions / agents)を、session_per_task で、タスクごとにサブセッションを立ち上げるか(true / false)を指定できる。役ごとのモデル(advisor / designer / leader / coder / assister)も指定できる。既定は scope=all, via=auto, session_per_task=true で、メインはいっさい作業しない。「指揮塔になって」「管理職として動いて」「各タスクをサブセッションに分けて」「全部サブエージェントに任せて」「今後の作業は全部委譲して」「丸投げモードにして」「重い作業だけ委譲して」「orchestrator」などの依頼で使う。
 version: 2
 ---
 
@@ -63,19 +63,17 @@ version: 2
 | プランナー(難しい設計・判断) | `advisor` | `--advisor`(settings の `advisorModel`) | `fable` |
 | プロダクトオーナー(視覚レビュー、デザイン・モデリングの構築) | `designer` | なし(独自) | `fable` |
 | チームリーダー(サブセッションのマネジメント、結果の集約) | `leader` | なし(独自) | `sonnet` |
-| 探索係(検索・読み取り) | `explorer` | 組み込みの `Explore` サブエージェントと同じ意味 | `haiku` |
 | コーダー(実装、Unity の操作、コードの確認) | `coder` | なし(独自) | `auto` |
-| 事務係(反復作業) | `assister` | なし(small/fast モデルの枠に相当。`ANTHROPIC_DEFAULT_HAIKU_MODEL`、旧 `ANTHROPIC_SMALL_FAST_MODEL`) | `haiku` |
+| 事務係(探索、反復作業) | `assister` | なし(small/fast モデルの枠と、組み込みの `Explore` サブエージェントの役に相当。`ANTHROPIC_DEFAULT_HAIKU_MODEL`、旧 `ANTHROPIC_SMALL_FAST_MODEL`) | `haiku` |
 
 総監督(ユーザー)と、エンジニアリングマネージャー(メインセッション)はオプションにしない。メインのモデルはスキルからは変えない。
 
 - 値は alias(`fable` `opus` `sonnet` `haiku`)かフルID(`claude-fable-5-2` `claude-opus-5-5` `claude-sonnet-5-5` `claude-haiku-5-5`)で受け付ける。`Agent` の `model` には alias に直して渡し、`start_session` の `model` にはフルIDに直して渡す(「配役(モデルの割り当て)」節の指定値の表を使う)
 - `coder` だけは `auto` も受け付ける。`auto` は難度で分ける設定で、小さく明確な実装は `sonnet`、Unity の操作・込み入った実装・コードの確認は `opus` にする。alias かフルIDを指定すると、すべての実装をそのモデルに固定する
-- 引数は `key=value` のほか、CLI 風の `--advisor fable` や `--advisor=fable`、自然言語(「視覚レビューは Opus で」「探索は Sonnet に」)でもよい
+- 引数は `key=value` のほか、CLI 風の `--advisor fable` や `--advisor=fable`、自然言語(「視覚レビューは Opus で」「事務係は Sonnet に」)でもよい
 - `leader`: 決めるのは、`start_session` で起動するサブセッションのモデル。サブセッションの中の作業は、そのサブセッションが配役表に従ってさらに委譲する
-- `explorer`: 決めるのは、検索・読み取りで結論だけを返す探索担当のモデル。組み込みの `Explore` サブエージェントを使うときも、`model` にこの値を渡す
 - `advisor`: 名前は Claude Code 標準の advisor に合わせたが、決めるのは、このスキルが起動するプランナー担当のモデルだけ。Claude Code の `advisorModel` 設定や advisor ツールは変更しない
-- `assister`: 決めるのは、このスキルが起動する事務係のモデルだけ。環境変数は変更しない
+- `assister`: 決めるのは、このスキルが起動する事務係のモデルだけ。探索(検索・読み取り)もここに含み、組み込みの `Explore` サブエージェントを使うときも `model` にこの値を渡す。環境変数は変更しない
 
 ## 前提の確認
 
@@ -128,10 +126,9 @@ version: 2
 | プロダクトオーナー | Fable | `designer` | 見た目の判断(視覚レビュー、デザイン全般のレビュー)、狙いどおりかの判断、モデリングやデザインの構築 |
 | エンジニアリングマネージャー | Opus | なし(スキルからは変えない) | メインセッション(指揮塔)そのもの |
 | チームリーダー | Sonnet | `leader` | サブセッションのマネジメント(中の作業を委譲し、結果を集約(Reduce)・取りまとめてメインに報告する) |
-| 探索係 | Haiku | `explorer` | 探索(検索・読み取り) |
 | プランナー | Fable | `advisor` | 難しい設計・判断 |
 | コーダー | Sonnet / Opus(難度で分ける) | `coder`(既定 `auto`) | 実装、Unity の操作、コードの確認 |
-| 事務係 | Haiku | `assister` | 簡単で明確な、反復の要る単純作業 |
+| 事務係 | Haiku | `assister` | 探索(検索・読み取り)と、簡単で明確な、反復の要る単純作業 |
 
 モデルの指定値は次のとおり。
 
@@ -152,24 +149,24 @@ version: 2
   - そのほか、複雑な仕様の組み立てや、Unity・Figma のような視覚的な判断との組み合わせが要る作業
 - **コーダー(`coder`、既定 `auto`)**: `auto` のときは、方針が明確で小さな実装は Sonnet、Unity の操作・込み入った実装・コードの確認は Opus にする。モデルを指定したときは、すべての実装をそのモデルに任せる
 - **チームリーダー(`leader`、既定 Sonnet)**: `start_session` で起動するサブセッション(とくに `session_per_task=true` のタスク単位のサブセッション)を受け持つ。中の作業を配役表に従ってさらに委譲し、結果を取りまとめてメインに報告する。複数の調べ物の結果の集約もここで行う
-- **探索係(`explorer`、既定 Haiku)**: コードベースやファイルの検索・読み取りなど、結論だけを返す探索を受け持つ。組み込みの `Explore` サブエージェントと同じ意味
-- **事務係(`assister`、既定 Haiku)**: 手順が決まっていて判断の要らない、繰り返しの作業(一括の置き換え、決まった形式での取得、確定した返信文の投稿など)
+- **事務係(`assister`、既定 Haiku)**: 次の2つを受け持つ
+  - 探索: コードベースやファイルの検索・読み取りなど、結論だけを返す作業(組み込みの `Explore` サブエージェントと同じ役)
+  - 反復作業: 手順が決まっていて判断の要らない、繰り返しの作業(一括の置き換え、決まった形式での取得、確定した返信文の投稿など)
 
 ### 迷ったとき
 
 - 視覚(画像の良し悪し)の判断、デザインのレビュー、モデリングやデザインの構築なら `designer`(既定 Fable)
 - 立体の形、シーンの構成、仕組み全体の設計が絡めば `advisor`(既定 Fable)
 - 方針が決まっていて手を動かすだけなら `coder`。`auto` なら、小さく明確なものは Sonnet、込み入ったものは Opus
-- 検索・読み取りで結論を返すだけなら `explorer`(既定 Haiku)
 - 複数の結果の集約・取りまとめや、サブセッションとしてタスクを任せるなら `leader`(既定 Sonnet)
-- 判断が要らない繰り返しなら `assister`(既定 Haiku)
+- 検索・読み取りで結論を返すだけ、または判断が要らない繰り返しなら `assister`(既定 Haiku)
 - どちらか決めきれないときは、重いほうのモデルを選ぶ
 
 ## 手段の使い分け(via=auto のとき)
 
 | 作業の性質 | 置き場所 |
 |---|---|
-| 調べ物、読み取り、集計、検証など、結論だけが欲しい | `Agent`。モデルは配役表に従う(探索は `explorer`、複数の結果の集約は `leader`、判断の要らない反復は `assister`、視覚レビューやデザインのレビューは `designer`、難しい設計は `advisor` の値)。調べ物は `Explore` や `researcher`、方針の設計は `Plan` |
+| 調べ物、読み取り、集計、検証など、結論だけが欲しい | `Agent`。モデルは配役表に従う(探索と判断の要らない反復は `assister`、複数の結果の集約は `leader`、視覚レビューやデザインのレビューは `designer`、難しい設計は `advisor` の値)。調べ物は `Explore` や `researcher`、方針の設計は `Plan` |
 | ブランチ・PR・ファイルの変更が残る実装、途中で開いて確認・指示したくなる長い作業 | 独立したサブセッション(`start_session`) |
 | 既存のサブセッションの文脈の続き | そのセッションへ伝達(`send_message` / `SendMessage`) |
 
